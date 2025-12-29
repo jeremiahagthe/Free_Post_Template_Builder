@@ -39,22 +39,64 @@ async function downloadImage(url) {
 /**
  * Create text overlay SVG with title and subtitle
  */
-function createTextSVG({ title, subtitle, textColor = '#FFFFFF', width, height }) {
+function createTextSVG({ title, subtitle, textColor = '#FFFFFF', width, height, fontFamily = 'Arial' }) {
   const titleSize = Math.floor(width * 0.055); // ~60pt for 1080px
   const subtitleSize = Math.floor(width * 0.033); // ~36pt for 1080px
   const padding = Math.floor(width * 0.05);
   const maxTextWidth = width - (padding * 2);
 
+  // Check if we have any text to render
+  const hasTitle = title && title.trim().length > 0;
+  const hasSubtitle = subtitle && subtitle.trim().length > 0;
+  
+  // Return empty SVG if no text
+  if (!hasTitle && !hasSubtitle) {
+    return Buffer.from(`<svg width="${width}" height="${height}"></svg>`);
+  }
+
+  // Calculate vertical positioning
+  let titleY = height / 2;
+  let subtitleY = height / 2;
+  
+  if (hasTitle && hasSubtitle) {
+    titleY = height / 2 - subtitleSize;
+    subtitleY = height / 2 + titleSize;
+  } else if (hasTitle) {
+    titleY = height / 2;
+  } else if (hasSubtitle) {
+    subtitleY = height / 2;
+  }
+
+  // Map font names to font-family CSS strings
+  const fontFamilyMap = {
+    'Arial': 'Arial, Helvetica, sans-serif',
+    'Helvetica': 'Helvetica, Arial, sans-serif',
+    'Roboto': 'Roboto, Arial, sans-serif',
+    'Open Sans': '"Open Sans", Arial, sans-serif',
+    'Montserrat': 'Montserrat, Arial, sans-serif',
+    'Bebas Neue': '"Bebas Neue", Impact, Arial, sans-serif',
+    'Impact': 'Impact, Arial Black, sans-serif',
+    'Futura': 'Futura, "Trebuchet MS", Arial, sans-serif',
+    'Georgia': 'Georgia, serif',
+    'Times': '"Times New Roman", Times, serif'
+  };
+
+  const fontFamilyCSS = fontFamilyMap[fontFamily] || fontFamilyMap['Arial'];
+
+  // Note: Sharp doesn't fetch external resources, so only system fonts will work
+  // Google Fonts (Roboto, Montserrat, etc.) will fall back to Arial
+  // To use custom fonts, they must be embedded as base64 data URIs
+
   // Create SVG with text
   const svg = `
-    <svg width="${width}" height="${height}">
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="shadow">
           <feDropShadow dx="2" dy="2" stdDeviation="4" flood-opacity="0.5"/>
         </filter>
         <style>
           .title {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: ${fontFamilyCSS};
             font-size: ${titleSize}px;
             font-weight: bold;
             fill: ${textColor};
@@ -64,7 +106,7 @@ function createTextSVG({ title, subtitle, textColor = '#FFFFFF', width, height }
             filter: url(#shadow);
           }
           .subtitle {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: ${fontFamilyCSS};
             font-size: ${subtitleSize}px;
             font-weight: normal;
             fill: ${textColor};
@@ -76,19 +118,23 @@ function createTextSVG({ title, subtitle, textColor = '#FFFFFF', width, height }
         </style>
       </defs>
 
+      ${hasTitle ? `
       <!-- Title -->
-      <text x="${width/2}" y="${height/2 - subtitleSize}"
+      <text x="${width/2}" y="${titleY}"
             text-anchor="middle"
             class="title">
         ${escapeXml(title)}
       </text>
+      ` : ''}
 
+      ${hasSubtitle ? `
       <!-- Subtitle -->
-      <text x="${width/2}" y="${height/2 + titleSize}"
+      <text x="${width/2}" y="${subtitleY}"
             text-anchor="middle"
             class="subtitle">
         ${escapeXml(subtitle)}
       </text>
+      ` : ''}
     </svg>
   `;
 
@@ -99,7 +145,8 @@ function createTextSVG({ title, subtitle, textColor = '#FFFFFF', width, height }
  * Escape XML special characters
  */
 function escapeXml(unsafe) {
-  return unsafe.replace(/[<>&'"]/g, (c) => {
+  if (!unsafe) return '';
+  return String(unsafe).replace(/[<>&'"]/g, (c) => {
     switch (c) {
       case '<': return '&lt;';
       case '>': return '&gt;';
@@ -127,24 +174,35 @@ async function generateSlide({ background, slide, width, height, index }) {
       .png()
       .toBuffer();
 
-    // Create text overlay
-    const textSVG = createTextSVG({
-      title: slide.title || '',
-      subtitle: slide.subtitle || '',
-      textColor: slide.textColor || '#FFFFFF',
-      width,
-      height
-    });
+    // Check if we have text to render
+    const hasText = (slide.title && slide.title.trim().length > 0) || 
+                    (slide.subtitle && slide.subtitle.trim().length > 0);
+    
+    let finalImage;
+    if (hasText) {
+      // Create text overlay
+      const textSVG = createTextSVG({
+        title: slide.title || '',
+        subtitle: slide.subtitle || '',
+        textColor: slide.textColor || '#FFFFFF',
+        fontFamily: slide.fontFamily || 'Arial',
+        width,
+        height
+      });
 
-    // Composite text over background
-    const finalImage = await sharp(processedBackground)
-      .composite([{
-        input: textSVG,
-        top: 0,
-        left: 0
-      }])
-      .png()
-      .toBuffer();
+      // Composite text over background
+      finalImage = await sharp(processedBackground)
+        .composite([{
+          input: textSVG,
+          top: 0,
+          left: 0
+        }])
+        .png()
+        .toBuffer();
+    } else {
+      // No text, just use the background
+      finalImage = processedBackground;
+    }
 
     // Convert to base64
     const base64 = finalImage.toString('base64');
