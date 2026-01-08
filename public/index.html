@@ -349,6 +349,9 @@
         <div class="header">
             <h1>🎨 Carousel Generator</h1>
             <p>Free Template.io Alternative - Generate Beautiful Social Media Carousels</p>
+            <p style="font-size: 1em; margin-top: 10px; opacity: 0.8;">
+                💰 100% Free Forever • 🚀 Lightning Fast • 🔒 Your Data Stays Yours
+            </p>
         </div>
 
         <div class="card">
@@ -358,7 +361,10 @@
                     1. Add background image URLs (Google Drive, Unsplash, etc.)<br>
                     2. Add slides with title and subtitle for each background<br>
                     3. Set custom dimensions (default: 1080x1080 for Instagram/Facebook)<br>
-                    4. Generate and download your carousel images!
+                    4. Preview your slides before generating (optional)<br>
+                    5. Generate and download your carousel images!<br>
+                    <br>
+                    <strong>✨ New:</strong> Automatic text wrapping, custom fonts, and live preview!
                 </p>
             </div>
 
@@ -401,7 +407,163 @@
         </div>
 
         <div id="results-container" style="display: none;"></div>
+
+        <!-- Documentation Section -->
+        <div class="card" id="docs-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #667eea; margin: 0;">📚 Documentation & Guide</h2>
+                <button type="button" class="btn btn-secondary" onclick="toggleDocs()" id="docs-toggle">Show Docs</button>
+            </div>
+            
+            <div id="docs-content" style="display: none;">
+                <!-- Quick Start -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🚀 Quick Start</h3>
+                    <ol style="line-height: 2; color: #555;">
+                        <li><strong>Add Background Images:</strong> Paste image URLs (one per line). Supports Google Drive, Unsplash, Pexels, or any public image URL.</li>
+                        <li><strong>Create Slides:</strong> Click "+ Add Slide" and enter title and subtitle for each background image.</li>
+                        <li><strong>Set Dimensions:</strong> Choose your platform size (1080x1080 for Instagram, 1080x1920 for Stories, etc.)</li>
+                        <li><strong>Customize:</strong> Adjust text color, font, and use preview to see how it looks.</li>
+                        <li><strong>Generate:</strong> Click "Generate Carousel" and download your images!</li>
+                    </ol>
+                </div>
+
+                <!-- Platform Dimensions -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📱 Platform-Specific Dimensions</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Platform</th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Width</th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Height</th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Aspect Ratio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 10px; border-bottom: 1px solid #dee2e6;"><strong>Instagram Feed</strong></td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1080</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1080</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1:1 (Square)</td></tr>
+                                <tr><td style="padding: 10px; border-bottom: 1px solid #dee2e6;"><strong>Instagram Stories</strong></td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1080</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1920</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">9:16 (Vertical)</td></tr>
+                                <tr><td style="padding: 10px; border-bottom: 1px solid #dee2e6;"><strong>Facebook Post</strong></td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1080</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1080</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1:1 (Square)</td></tr>
+                                <tr><td style="padding: 10px; border-bottom: 1px solid #dee2e6;"><strong>TikTok</strong></td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1080</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1920</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">9:16 (Vertical)</td></tr>
+                                <tr><td style="padding: 10px; border-bottom: 1px solid #dee2e6;"><strong>LinkedIn</strong></td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1200</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">627</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1.91:1 (Horizontal)</td></tr>
+                                <tr><td style="padding: 10px; border-bottom: 1px solid #dee2e6;"><strong>Twitter/X</strong></td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">1200</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">675</td><td style="padding: 10px; border-bottom: 1px solid #dee2e6;">16:9 (Horizontal)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">✨ Features</h3>
+                    <ul style="line-height: 2; color: #555;">
+                        <li><strong>Automatic Text Wrapping:</strong> Long text automatically wraps to fit within image boundaries</li>
+                        <li><strong>Custom Fonts:</strong> Choose from Impact, Arial, Helvetica, Futura, Georgia, Times, and more</li>
+                        <li><strong>Text Styling:</strong> Custom colors, sizes, and positioning for perfect text placement</li>
+                        <li><strong>Preview:</strong> Preview each slide before generating the full carousel</li>
+                        <li><strong>Fast Generation:</strong> Generate multiple slides in under 500ms</li>
+                        <li><strong>100% Free:</strong> No limits, no subscriptions, no credit card required</li>
+                    </ul>
+                </div>
+
+                <!-- Image Sources -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🖼️ Image Sources</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                        <p style="margin-bottom: 10px; color: #555;"><strong>Free Image Sources:</strong></p>
+                        <ul style="line-height: 2; color: #555; margin-left: 20px;">
+                            <li><strong>Unsplash:</strong> <code style="background: white; padding: 2px 6px; border-radius: 4px;">https://images.unsplash.com/photo-xxx</code></li>
+                            <li><strong>Pexels:</strong> <code style="background: white; padding: 2px 6px; border-radius: 4px;">https://images.pexels.com/photos/xxx</code></li>
+                            <li><strong>Picsum:</strong> <code style="background: white; padding: 2px 6px; border-radius: 4px;">https://picsum.photos/1080/1080</code></li>
+                            <li><strong>Google Drive:</strong> Use <code style="background: white; padding: 2px 6px; border-radius: 4px;">https://drive.google.com/uc?id=FILE_ID</code> format</li>
+                        </ul>
+                        <p style="margin-top: 15px; color: #666; font-size: 14px;">💡 <strong>Tip:</strong> Make sure your image URLs are publicly accessible. Private images won't work.</p>
+                    </div>
+                </div>
+
+                <!-- API Usage -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔌 API Usage</h3>
+                    <p style="color: #555; margin-bottom: 15px;">Use the API programmatically or integrate with automation tools like n8n:</p>
+                    <div style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6;">
+                        <div style="color: #a6e22e;">POST</div> <span style="color: #66d9ef;">/.netlify/functions/carousel</span><br><br>
+                        <div style="color: #f92672;">{</div><br>
+                        <div style="margin-left: 20px;">
+                            <span style="color: #a6e22e;">"backgrounds"</span>: <span style="color: #66d9ef;">["https://picsum.photos/1080/1080"]</span>,<br>
+                            <span style="color: #a6e22e;">"slides"</span>: [{<br>
+                            <div style="margin-left: 20px;">
+                                <span style="color: #a6e22e;">"title"</span>: <span style="color: #e6db74;">"Your Title"</span>,<br>
+                                <span style="color: #a6e22e;">"subtitle"</span>: <span style="color: #e6db74;">"Your subtitle text"</span>,<br>
+                                <span style="color: #a6e22e;">"textColor"</span>: <span style="color: #e6db74;">"#FFFFFF"</span>,<br>
+                                <span style="color: #a6e22e;">"fontFamily"</span>: <span style="color: #e6db74;">"Impact"</span>,<br>
+                                <span style="color: #a6e22e;">"maxTitleWidth"</span>: <span style="color: #ae81ff;">800</span><br>
+                            </div>
+                            }],<br>
+                            <span style="color: #a6e22e;">"width"</span>: <span style="color: #ae81ff;">1080</span>,<br>
+                            <span style="color: #a6e22e;">"height"</span>: <span style="color: #ae81ff;">1080</span><br>
+                        </div>
+                        <div style="color: #f92672;">}</div>
+                    </div>
+                    <p style="margin-top: 15px; color: #666; font-size: 14px;">📖 <strong>Full API Documentation:</strong> See <a href="https://github.com/jeremiahagthe/Free_templateIo_copy" target="_blank" style="color: #667eea;">GitHub README</a> for complete API reference.</p>
+                </div>
+
+                <!-- Tips -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">💡 Pro Tips</h3>
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 4px;">
+                        <ul style="line-height: 2; color: #856404; margin-left: 20px;">
+                            <li><strong>Text Contrast:</strong> Use white text (#FFFFFF) on dark backgrounds, dark text on light backgrounds</li>
+                            <li><strong>Font Choice:</strong> Impact is great for bold statements, Helvetica for clean modern looks, Georgia for elegant content</li>
+                            <li><strong>Text Length:</strong> Keep titles under 50 characters and subtitles under 100 characters for best results</li>
+                            <li><strong>Image Quality:</strong> Use high-resolution images (at least 1080px) for best quality output</li>
+                            <li><strong>Preview First:</strong> Use the preview button to check each slide before generating the full carousel</li>
+                            <li><strong>Batch Processing:</strong> Generate up to 10 slides at once for optimal performance</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔧 Troubleshooting</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <p style="margin-bottom: 10px; color: #555;"><strong>Text not appearing?</strong></p>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Make sure you've entered both title and subtitle, or at least one of them. Check that text color contrasts with your background.</p>
+                        
+                        <p style="margin-bottom: 10px; color: #555;"><strong>Image download failed?</strong></p>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Verify your image URL is publicly accessible. For Google Drive, use the <code style="background: white; padding: 2px 6px; border-radius: 4px;">/uc?id=</code> format.</p>
+                        
+                        <p style="margin-bottom: 10px; color: #555;"><strong>Text overflow?</strong></p>
+                        <p style="color: #666; font-size: 14px;">Text automatically wraps, but if you see overflow, try shorter text or adjust the font size in the API.</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align: center; padding-top: 20px; border-top: 2px solid #e0e0e0; margin-top: 30px;">
+                    <p style="color: #666; margin-bottom: 10px;">
+                        <strong>Made with ❤️ as a free alternative to expensive SaaS tools</strong>
+                    </p>
+                    <p style="color: #999; font-size: 14px;">
+                        <a href="https://github.com/jeremiahagthe/Free_templateIo_copy" target="_blank" style="color: #667eea; text-decoration: none;">⭐ Star on GitHub</a> | 
+                        <a href="https://github.com/jeremiahagthe/Free_templateIo_copy/issues" target="_blank" style="color: #667eea; text-decoration: none;">Report Issue</a> | 
+                        <a href="https://github.com/jeremiahagthe/Free_templateIo_copy/blob/main/README.md" target="_blank" style="color: #667eea; text-decoration: none;">Full Documentation</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        function toggleDocs() {
+            const content = document.getElementById('docs-content');
+            const toggle = document.getElementById('docs-toggle');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.textContent = 'Hide Docs';
+            } else {
+                content.style.display = 'none';
+                toggle.textContent = 'Show Docs';
+            }
+        }
 
     <script>
         let slideCount = 0;
