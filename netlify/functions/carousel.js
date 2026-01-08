@@ -99,8 +99,56 @@ async function downloadImage(url, maxRedirects = 10, redirectCount = 0) {
 }
 
 /**
+ * Helper function to wrap text into lines based on max width
+ * Uses character width estimation for accurate line breaking
+ */
+function wrapTextIntoLines(text, maxWidth, fontSize, fontFamily) {
+  if (!text || text.trim().length === 0) {
+    return [];
+  }
+
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+
+  // Character width multipliers based on font type
+  // Impact and bold fonts are wider, serif fonts vary
+  const charWidthMultipliers = {
+    'Impact': 0.65,
+    'Arial Black': 0.65,
+    'Bebas Neue': 0.55,
+    'Arial': 0.55,
+    'Helvetica': 0.55,
+    'Futura': 0.50,
+    'Georgia': 0.55,
+    'Times': 0.50,
+    'default': 0.55
+  };
+
+  const multiplier = charWidthMultipliers[fontFamily] || charWidthMultipliers['default'];
+
+  for (const word of words) {
+    const testLine = currentLine ? currentLine + ' ' + word : word;
+    const estimatedWidth = testLine.length * fontSize * multiplier;
+
+    if (estimatedWidth > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  
+  return lines.length > 0 ? lines : [text];
+}
+
+/**
  * Create text overlay SVG with title and subtitle
- * Supports text wrapping and custom positioning
+ * Uses native SVG text elements with tspan for line wrapping (compatible with Sharp/librsvg)
  */
 function createTextSVG({ 
   title, 
@@ -138,24 +186,6 @@ function createTextSVG({
     return Buffer.from(`<svg width="${width}" height="${height}"></svg>`);
   }
 
-  // Calculate vertical positioning (use provided or calculate)
-  let finalTitleY = titleY;
-  let finalSubtitleY = subtitleY;
-  
-  if (finalTitleY === null || finalTitleY === undefined) {
-    finalTitleY = height / 2;
-    if (hasTitle && hasSubtitle) {
-      finalTitleY = height / 2 - calculatedSubtitleSize;
-    }
-  }
-  
-  if (finalSubtitleY === null || finalSubtitleY === undefined) {
-    finalSubtitleY = height / 2;
-    if (hasTitle && hasSubtitle) {
-      finalSubtitleY = height / 2 + calculatedTitleSize;
-    }
-  }
-
   // Calculate horizontal positioning
   const titleXPos = titleX !== null && titleX !== undefined ? titleX : width / 2;
   const subtitleXPos = subtitleX !== null && subtitleX !== undefined ? subtitleX : width / 2;
@@ -166,65 +196,98 @@ function createTextSVG({
     'Arial': 'Arial, Helvetica, sans-serif',
     'Helvetica': 'Helvetica, Arial, sans-serif',
     'Roboto': 'Roboto, Arial, sans-serif',
-    'Open Sans': '"Open Sans", Arial, sans-serif',
+    'Open Sans': 'Open Sans, Arial, sans-serif',
     'Montserrat': 'Montserrat, Arial, sans-serif',
-    'Bebas Neue': '"Bebas Neue", Impact, Arial, sans-serif',
+    'Bebas Neue': 'Bebas Neue, Impact, Arial, sans-serif',
     'Impact': 'Impact, Arial Black, sans-serif',
-    'Futura': 'Futura, "Trebuchet MS", Arial, sans-serif',
+    'Futura': 'Futura, Trebuchet MS, Arial, sans-serif',
     'Georgia': 'Georgia, serif',
-    'Times': '"Times New Roman", Times, serif'
+    'Times': 'Times New Roman, Times, serif'
   };
 
   const fontFamilyCSS = fontFamilyMap[fontFamily] || fontFamilyMap['Arial'];
 
-  // Create SVG with text (using foreignObject for proper text wrapping)
-  const svg = `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <defs>
-        <filter id="shadow">
-          <feDropShadow dx="2" dy="2" stdDeviation="4" flood-opacity="0.5"/>
-        </filter>
-      </defs>
+  // Wrap text into lines
+  const titleLines = hasTitle ? wrapTextIntoLines(title, titleMaxWidth, calculatedTitleSize, fontFamily) : [];
+  const subtitleLines = hasSubtitle ? wrapTextIntoLines(subtitle, subtitleMaxWidth, calculatedSubtitleSize, fontFamily) : [];
 
-      ${hasTitle ? `
-      <!-- Title with wrapping -->
-      <foreignObject x="${titleXPos - titleMaxWidth/2}" y="${finalTitleY - calculatedTitleSize}" width="${titleMaxWidth}" height="${calculatedTitleSize * 3}" style="overflow: visible;">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="
-          font-family: ${fontFamilyCSS};
-          font-size: ${calculatedTitleSize}px;
-          font-weight: bold;
-          color: ${textColor};
-          text-align: ${textAlign};
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 2px rgba(0,0,0,0.3);
-          line-height: 1.2;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-          -webkit-text-stroke: 1px rgba(0,0,0,0.3);
-          -webkit-text-fill-color: ${textColor};
-        ">${escapeXml(title)}</div>
-      </foreignObject>
-      ` : ''}
+  // Calculate line heights
+  const titleLineHeight = calculatedTitleSize * 1.2;
+  const subtitleLineHeight = calculatedSubtitleSize * 1.3;
 
-      ${hasSubtitle ? `
-      <!-- Subtitle with wrapping -->
-      <foreignObject x="${subtitleXPos - subtitleMaxWidth/2}" y="${finalSubtitleY - calculatedSubtitleSize/2}" width="${subtitleMaxWidth}" height="${calculatedSubtitleSize * 4}" style="overflow: visible;">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="
-          font-family: ${fontFamilyCSS};
-          font-size: ${calculatedSubtitleSize}px;
-          font-weight: normal;
-          color: ${textColor};
-          text-align: ${textAlign};
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.2);
-          line-height: 1.3;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-          -webkit-text-stroke: 0.5px rgba(0,0,0,0.2);
-          -webkit-text-fill-color: ${textColor};
-        ">${escapeXml(subtitle)}</div>
-      </foreignObject>
-      ` : ''}
-    </svg>
-  `;
+  // Calculate vertical positioning (use provided or calculate)
+  // Adjust for number of lines to center the text block
+  let finalTitleY = titleY;
+  let finalSubtitleY = subtitleY;
+  
+  if (finalTitleY === null || finalTitleY === undefined) {
+    const titleBlockHeight = titleLines.length * titleLineHeight;
+    finalTitleY = height / 2;
+    if (hasTitle && hasSubtitle) {
+      // Position title above center, accounting for multi-line
+      finalTitleY = height * 0.35;
+    }
+  }
+  
+  if (finalSubtitleY === null || finalSubtitleY === undefined) {
+    const subtitleBlockHeight = subtitleLines.length * subtitleLineHeight;
+    finalSubtitleY = height / 2;
+    if (hasTitle && hasSubtitle) {
+      // Position subtitle below center, accounting for multi-line
+      finalSubtitleY = height * 0.65;
+    }
+  }
+
+  // Generate title tspans
+  const titleTspans = titleLines.map((line, index) => {
+    if (index === 0) {
+      return escapeXml(line);
+    }
+    return `<tspan x="${titleXPos}" dy="${titleLineHeight}">${escapeXml(line)}</tspan>`;
+  }).join('');
+
+  // Generate subtitle tspans
+  const subtitleTspans = subtitleLines.map((line, index) => {
+    if (index === 0) {
+      return escapeXml(line);
+    }
+    return `<tspan x="${subtitleXPos}" dy="${subtitleLineHeight}">${escapeXml(line)}</tspan>`;
+  }).join('');
+
+  // Create SVG with native text elements (compatible with Sharp/librsvg)
+  const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  ${hasTitle && titleLines.length > 0 ? `
+  <text x="${titleXPos}" y="${finalTitleY}" 
+        text-anchor="${textAnchor}"
+        font-family="${fontFamilyCSS}"
+        font-size="${calculatedTitleSize}"
+        font-weight="bold"
+        fill="${textColor}"
+        stroke="rgba(0,0,0,0.4)"
+        stroke-width="2"
+        paint-order="stroke fill"
+        filter="url(#shadow)">${titleTspans}</text>
+  ` : ''}
+
+  ${hasSubtitle && subtitleLines.length > 0 ? `
+  <text x="${subtitleXPos}" y="${finalSubtitleY}" 
+        text-anchor="${textAnchor}"
+        font-family="${fontFamilyCSS}"
+        font-size="${calculatedSubtitleSize}"
+        font-weight="normal"
+        fill="${textColor}"
+        stroke="rgba(0,0,0,0.3)"
+        stroke-width="1"
+        paint-order="stroke fill"
+        filter="url(#shadow)">${subtitleTspans}</text>
+  ` : ''}
+</svg>`;
 
   return Buffer.from(svg);
 }
